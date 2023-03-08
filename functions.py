@@ -28,7 +28,7 @@ def remove_random_features(arr, percent=.10):
         rand_index = np.random.randint(0, arr.shape[1])
         new_arr[i, rand_index] = np.nan
     
-    return new_arr
+    return new_arr, num_rows_to_modify
 
 # Runs a simulation of n trials with an imputer, data removing strategy, and how much data is missing and returns an array of MSE
 def simulate(imputer, data, trials, remove_func=remove_random_features, percent_missing=.10):
@@ -38,17 +38,17 @@ def simulate(imputer, data, trials, remove_func=remove_random_features, percent_
     
     for i in range(trials):
         data_with_missing_features = remove_func(data, percent_missing)
-        imputed_data = imputer.fit_transform(data_with_missing_features)
+        imputed_data, m = imputer.fit_transform(data_with_missing_features)
         
-        res[i] = (np.square(data - imputed_data)).mean()
+        res[i] = (np.square(data - imputed_data)) / m
     return res
 
 # removes a percentage of random features with no row conditions
 def remove_random_features_row_independent(arr, percent=.10):
-    num_rows_to_modify = int(percent * arr.shape[0]*arr.shape[1])
+    num_points_to_modify = int(percent * arr.shape[0]*arr.shape[1])
     idxs = [(i,j) for i in np.arange(arr.shape[0]) for j in np.arange(arr.shape[1])]
     new_arr = arr.copy()
-    for i,j in random.sample(idxs, num_rows_to_modify):
+    for i,j in random.sample(idxs, num_points_to_modify):
         new_arr[i, j] = np.nan
     
-    return new_arr
+    return new_arr, num_points_to_modify
