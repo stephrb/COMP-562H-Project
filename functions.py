@@ -35,12 +35,10 @@ def simulate(imputer, data, trials, remove_func=remove_random_features, percent_
     np.random.seed(42)
     
     res = np.zeros(trials)
-    
     for i in range(trials):
-        data_with_missing_features = remove_func(data, percent_missing)
-        imputed_data, m = imputer.fit_transform(data_with_missing_features)
-        
-        res[i] = (np.square(data - imputed_data)) / m
+        data_with_missing_features, m = remove_func(data, percent_missing)
+        imputed_data= imputer.fit_transform(data_with_missing_features)
+        res[i] = (np.square(data - imputed_data)).sum() / m
     return res
 
 # removes a percentage of random features with no row conditions
